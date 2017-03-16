@@ -19,6 +19,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -126,9 +127,7 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        Log.v("CatalogActivity", "New row ID " + newRowId);
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI,values);
     }
 
     @Override

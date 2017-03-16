@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import com.example.android.pets.data.PetContract.PetEntry;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by sonu on 15/3/17.
@@ -70,7 +71,41 @@ public class PetProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        switch (match){
+            case PETS:
+                return insertPet(uri, values);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        }
+    }
+
+    private Uri insertPet(Uri uri, ContentValues values){
+
+        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+        if (name == null){
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        Integer gender = values.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+        if (gender == null || !PetEntry.isValidGender(gender) ){
+            throw new IllegalArgumentException("Pet requires valid gender");
+        }
+
+       Integer weight = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+        if (weight == null){
+            throw new IllegalArgumentException("Pet requires valid weight");
+        }
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        long id = database.insert(PetEntry.TABLE_NAME,null, values);
+
+        if (id == -1){
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
+
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
